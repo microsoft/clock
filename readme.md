@@ -53,3 +53,9 @@ func TestDisplaysCorrectly(t *testing.T) {
     assert.Equal(t, "11:13:21", d.formatted())
 }
 ```
+
+### API & Compatibility
+
+The API provided by this package and the mock version is nearly identical to that of the `time` package, with two notable differences:
+ - The channel for Ticker and Timer instances an accessed via the `.Chan()` method, rather than reading the `.C` property. This allows the structures to be swapped out for their mock variants.
+ - The mock Ticker never skips ticks when time advances. This allows you to call `.AddTime`/`.SetTime` on the mock clock without having to advance to each "ticked" time.
