@@ -17,6 +17,7 @@ type MockClock struct {
 
 var _ Clock = new(MockClock)
 
+// Now returns the current local time.
 func (m *MockClock) Now() time.Time {
 	m.cond.L.Lock()
 	defer m.cond.L.Unlock()
@@ -24,6 +25,7 @@ func (m *MockClock) Now() time.Time {
 	return m.now
 }
 
+// After waits for the duration to elapse and then sends the current time on the returned channel.
 func (m *MockClock) After(d time.Duration) <-chan time.Time {
 	ch := make(chan time.Time, 1)
 	target := m.Now().Add(d)
@@ -46,14 +48,17 @@ func (m *MockClock) After(d time.Duration) <-chan time.Time {
 	return ch
 }
 
+// Sleep pauses the current goroutine for at least the duration d. A negative or zero duration causes Sleep to return immediately.
 func (m *MockClock) Sleep(d time.Duration) {
 	<-m.After(d)
 }
 
+// Tick is a convenience wrapper for NewTicker providing access to the ticking channel only. While Tick is useful for clients that have no need to shut down the Ticker, be aware that without a way to shut it down the underlying Ticker cannot be recovered by the garbage collector; it "leaks".
 func (m *MockClock) Tick(d time.Duration) <-chan time.Time {
 	return m.NewTicker(d).Chan()
 }
 
+// AfterFunc waits for the duration to elapse and then calls f in its own goroutine. It returns a Timer that can be used to cancel the call using its Stop method.
 func (m *MockClock) AfterFunc(d time.Duration, f func()) Timer {
 	t := m.NewTimer(d)
 	go func() {
@@ -64,12 +69,15 @@ func (m *MockClock) AfterFunc(d time.Duration, f func()) Timer {
 	return t
 }
 
+// NewTimer creates a new Timer that will send the current time on its channel after at least duration d.
 func (m *MockClock) NewTimer(d time.Duration) Timer {
 	t := NewMockTimer(m)
 	t.Reset(d)
 	return t
 }
 
+// NewTimer creates a new Timer that will send the current time on its channel after at least duration d.
+// Note: unlike the default ticker included in Go, the mock ticker will *never* skip ticks as time advances.
 func (m *MockClock) NewTicker(d time.Duration) Ticker {
 	return NewMockTicker(m, d)
 }

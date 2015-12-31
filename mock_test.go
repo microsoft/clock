@@ -80,6 +80,18 @@ func TestTickerWorks(t *testing.T) {
 	assertDoesntGet(t, tk.Chan(), "expected ticker not to get after stopped")
 }
 
+func TestTickerCatchesUp(t *testing.T) {
+	c := NewMockClock()
+	tk := c.NewTicker(5 * time.Millisecond)
+	c.AddTime(20 * time.Millisecond)
+
+	assertGets(t, tk.Chan(), "ticker sends catchup 1")
+	assertGets(t, tk.Chan(), "ticker sends catchup 2")
+	assertGets(t, tk.Chan(), "ticker sends catchup 3")
+	assertGets(t, tk.Chan(), "ticker sends catchup 4")
+	assertDoesntGet(t, tk.Chan(), "ticker catchup doesn't overshoot")
+}
+
 func TestTimerWorks(t *testing.T) {
 	c := NewMockClock()
 	tm := c.NewTimer(5 * time.Millisecond)

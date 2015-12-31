@@ -10,6 +10,7 @@ type mockTicker struct {
 
 	clock    Clock
 	interval time.Duration
+	start    time.Time
 }
 
 var _ Ticker = new(mockTicker)
@@ -19,14 +20,15 @@ var _ Ticker = new(mockTicker)
 // not yet dug deep into the runtimeTimer to see how that works.
 // PRs are appreciated!
 func (m *mockTicker) wait() {
-	for {
+	for i := time.Duration(1); true; i++ {
+		delta := m.start.Add(m.interval * i).Sub(m.clock.Now())
+
 		select {
 		case <-m.stop:
 			return
-		case <-m.clock.After(m.interval):
+		case <-m.clock.After(delta):
+			m.c <- time.Now()
 		}
-
-		m.c <- time.Now()
 	}
 }
 
@@ -45,6 +47,7 @@ func NewMockTicker(c Clock, interval time.Duration) Ticker {
 		c:        make(chan time.Time),
 		stop:     make(chan bool),
 		interval: interval,
+		start:    c.Now(),
 		clock:    c,
 	}
 	go t.wait()

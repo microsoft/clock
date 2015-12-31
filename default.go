@@ -8,16 +8,29 @@ import (
 // time methods.
 type DefaultClock struct{}
 
-func (dc DefaultClock) Now() time.Time                         { return time.Now() }
+// Now returns the current local time.
+func (dc DefaultClock) Now() time.Time { return time.Now() }
+
+// After waits for the duration to elapse and then sends the current time on the returned channel.
 func (dc DefaultClock) After(d time.Duration) <-chan time.Time { return time.After(d) }
-func (dc DefaultClock) Sleep(d time.Duration)                  { time.Sleep(d) }
-func (dc DefaultClock) Tick(d time.Duration) <-chan time.Time  { return time.Tick(d) }
+
+// Sleep pauses the current goroutine for at least the duration d. A negative or zero duration causes Sleep to return immediately.
+func (dc DefaultClock) Sleep(d time.Duration) { time.Sleep(d) }
+
+// Tick is a convenience wrapper for NewTicker providing access to the ticking channel only. While Tick is useful for clients that have no need to shut down the Ticker, be aware that without a way to shut it down the underlying Ticker cannot be recovered by the garbage collector; it "leaks".
+func (dc DefaultClock) Tick(d time.Duration) <-chan time.Time { return time.Tick(d) }
+
+// AfterFunc waits for the duration to elapse and then calls f in its own goroutine. It returns a Timer that can be used to cancel the call using its Stop method.
 func (dc DefaultClock) AfterFunc(d time.Duration, f func()) Timer {
 	return &defaultTimer{*time.AfterFunc(d, f)}
 }
+
+// NewTimer creates a new Timer that will send the current time on its channel after at least duration d.
 func (dc DefaultClock) NewTimer(d time.Duration) Timer {
 	return &defaultTimer{*time.NewTimer(d)}
 }
+
+// NewTicker returns a new Ticker containing a channel that will send the time with a period specified by the duration argument.
 func (dc DefaultClock) NewTicker(d time.Duration) Ticker {
 	return &defaultTicker{*time.NewTicker(d)}
 }
