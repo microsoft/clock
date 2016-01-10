@@ -119,7 +119,7 @@ func NewMockClock(start ...time.Time) *MockClock {
 	} else if len(start) == 1 {
 		m.SetTime(start[0])
 	} else {
-		m.SetTime(time.Now())
+		m.SetTime(time.Now().UTC())
 	}
 
 	return m
