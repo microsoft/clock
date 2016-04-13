@@ -36,8 +36,9 @@ func (m *MockClock) After(d time.Duration) <-chan time.Time {
 			if target.After(m.now) {
 				m.cond.Wait()
 			} else {
+				now := m.now
 				m.cond.L.Unlock()
-				ch <- m.now
+				ch <- now
 				return
 			}
 
