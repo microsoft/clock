@@ -6,7 +6,7 @@ import (
 
 type mockTicker struct {
 	c    chan time.Time
-	stop chan bool
+	stop chan struct{}
 
 	clock    Clock
 	interval time.Duration
@@ -25,6 +25,7 @@ func (m *mockTicker) wait() {
 
 		select {
 		case <-m.stop:
+			close(m.c)
 			return
 		case <-m.clock.After(delta):
 			m.c <- time.Now()
@@ -37,7 +38,7 @@ func (m *mockTicker) Chan() <-chan time.Time {
 }
 
 func (m *mockTicker) Stop() {
-	m.stop <- true
+	close(m.stop)
 }
 
 // Creates a new Ticker using the provided Clock. You should not use this
@@ -45,7 +46,7 @@ func (m *mockTicker) Stop() {
 func NewMockTicker(c Clock, interval time.Duration) Ticker {
 	t := &mockTicker{
 		c:        make(chan time.Time),
-		stop:     make(chan bool),
+		stop:     make(chan struct{}),
 		interval: interval,
 		start:    c.Now(),
 		clock:    c,
