@@ -27,7 +27,7 @@ func (m *mockTicker) wait() {
 		case <-m.stop:
 			return
 		case <-m.clock.After(delta):
-			m.c <- time.Now()
+			m.c <- m.clock.Now()
 		}
 	}
 }
