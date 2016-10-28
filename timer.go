@@ -1,7 +1,6 @@
 package clock
 
 import (
-	"sync"
 	"time"
 )
 
@@ -9,7 +8,7 @@ type mockTimer struct {
 	c       chan time.Time
 	release chan bool
 
-	mu     sync.Mutex
+	lock   chan struct{}
 	clock  Clock
 	active bool
 	target time.Time
@@ -18,32 +17,29 @@ type mockTimer struct {
 var _ Timer = new(mockTimer)
 
 func (m *mockTimer) getTarget() time.Time {
-	m.mu.Lock()
-	defer m.mu.Unlock()
+	m.lock <- struct{}{}
+	defer func() { <-m.lock }()
 
 	return m.target
 }
 
 func (m *mockTimer) setInactive() {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
 	// If a release was sent in the meantime, that means a new timer
 	// was started or that we already stopped manually
 	select {
+	case m.lock <- struct{}{}:
+		defer func() { <-m.lock }()
 	case <-m.release:
 		return
-	default:
-		m.active = false
 	}
-
+	m.active = false
 }
 
 func (m *mockTimer) wait() {
 	select {
 	case <-m.clock.After(m.target.Sub(m.clock.Now())):
-		m.c <- m.clock.Now()
 		m.setInactive()
+		m.c <- m.clock.Now()
 	case <-m.release:
 	}
 }
@@ -54,8 +50,8 @@ func (m *mockTimer) Chan() <-chan time.Time {
 
 func (m *mockTimer) Reset(d time.Duration) bool {
 	var wasActive bool
-	m.mu.Lock()
-	defer m.mu.Unlock()
+	m.lock <- struct{}{}
+	defer func() { <-m.lock }()
 
 	wasActive, m.active = m.active, true
 	m.target = m.clock.Now().Add(d)
@@ -70,8 +66,8 @@ func (m *mockTimer) Reset(d time.Duration) bool {
 
 func (m *mockTimer) Stop() bool {
 	var wasActive bool
-	m.mu.Lock()
-	defer m.mu.Unlock()
+	m.lock <- struct{}{}
+	defer func() { <-m.lock }()
 
 	wasActive, m.active = m.active, false
 	if wasActive {
@@ -87,6 +83,7 @@ func NewMockTimer(c Clock) Timer {
 	return &mockTimer{
 		c:       make(chan time.Time, 1),
 		release: make(chan bool),
+		lock:    make(chan struct{}, 1),
 		clock:   c,
 	}
 }
