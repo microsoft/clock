@@ -1,4 +1,4 @@
-# clock [![GoDoc](https://godoc.org/github.com/WatchBeam/clock?status.svg)](https://godoc.org/github.com/WatchBeam/clock) [![Build Status](https://travis-ci.org/WatchBeam/clock.svg)](https://travis-ci.org/WatchBeam/clock)
+# clock [![GoDoc](https://godoc.org/github.com/mixer/clock?status.svg)](https://godoc.org/github.com/mixer/clock) [![Build Status](https://travis-ci.org/mixer/clock.svg)](https://travis-ci.org/mixer/clock)
 
 Time utility with lovely mocking support.
 
