@@ -124,3 +124,11 @@ func TestTimerResets(t *testing.T) {
 	c.AddTime(3 * time.Millisecond)
 	assertGets(t, tm.Chan(), "expected timer to get after reset when interval is up after restarted")
 }
+
+func TestTickerDeadlock(t *testing.T) { // fixes #6
+	c := NewMockClock()
+	tk := c.NewTicker(5 * time.Millisecond)
+	c.AddTime(6 * time.Millisecond)
+	time.Sleep(1 * time.Millisecond)
+	tk.Stop()
+}

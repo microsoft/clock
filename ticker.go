@@ -27,7 +27,11 @@ func (m *mockTicker) wait() {
 		case <-m.stop:
 			return
 		case <-m.clock.After(delta):
-			m.c <- m.clock.Now()
+			select {
+			case m.c <- m.clock.Now():
+			case <-m.stop:
+				return
+			}
 		}
 	}
 }
