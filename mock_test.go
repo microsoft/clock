@@ -80,6 +80,14 @@ func TestTickerWorks(t *testing.T) {
 	assertDoesntGet(t, tk.Chan(), "expected ticker not to get after stopped")
 }
 
+func TestTickerDeadlock(t *testing.T) {
+	c := NewMockClock()
+	tk := c.NewTicker(5 * time.Millisecond)
+	c.AddTime(6 * time.Millisecond)
+	time.Sleep(1 * time.Millisecond)
+	tk.Stop()
+}
+
 func TestTickerCatchesUp(t *testing.T) {
 	c := NewMockClock()
 	tk := c.NewTicker(5 * time.Millisecond)

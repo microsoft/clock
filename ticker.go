@@ -27,7 +27,15 @@ func (m *mockTicker) wait() {
 		case <-m.stop:
 			return
 		case <-m.clock.After(delta):
-			m.c <- m.clock.Now()
+			select {
+			case m.c <- m.clock.Now():
+				// Successful send
+			case <-time.After(100 * time.Millisecond):
+				// Drop tick (prevents deadlock). See
+				// time.Ticker docs "drops ticks to make up for
+				// slow receivers". 100ms seems to be adequate
+				// in real-world testing.
+			}
 		}
 	}
 }
