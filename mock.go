@@ -83,6 +83,11 @@ func (m *MockClock) NewTicker(d time.Duration) Ticker {
 	return NewMockTicker(m, d)
 }
 
+// Since returns the time elapsed since t.
+func (m *MockClock) Since(t time.Time) time.Duration {
+	return m.Now().Sub(t)
+}
+
 // Sets the mock clock's time to the given absolute time.
 func (m *MockClock) SetTime(t time.Time) {
 	m.cond.L.Lock()
