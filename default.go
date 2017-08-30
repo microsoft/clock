@@ -35,9 +35,6 @@ func (dc DefaultClock) NewTicker(d time.Duration) Ticker {
 	return &defaultTicker{*time.NewTicker(d)}
 }
 
-// Since returns the time elapsed since t.
-func (dc DefaultClock) Since(t time.Time) time.Duration { return time.Since(t) }
-
 type defaultTimer struct{ time.Timer }
 
 var _ Timer = new(defaultTimer)

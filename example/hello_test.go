@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mixer/clock"
+	"github.com/WatchBeam/clock"
 	"github.com/stretchr/testify/assert"
 )
 

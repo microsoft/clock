@@ -14,7 +14,6 @@ type Clock interface {
 	AfterFunc(d time.Duration, f func()) Timer
 	NewTimer(d time.Duration) Timer
 	NewTicker(d time.Duration) Ticker
-	Since(t time.Time) time.Duration
 }
 
 // The Timer is an interface for time.Timer, and can also be swapped in mocks.
