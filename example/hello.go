@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/WatchBeam/clock"
+	"github.com/mixer/clock"
 )
 
 func main() {

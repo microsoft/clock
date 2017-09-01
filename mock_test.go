@@ -132,3 +132,11 @@ func TestTickerDeadlock(t *testing.T) { // fixes #6
 	time.Sleep(1 * time.Millisecond)
 	tk.Stop()
 }
+
+func TestSince(t *testing.T) {
+	c := NewMockClock()
+	before := c.Now()
+	assertBool(t, true, c.Since(before) == 0, "expected no time to pass without AddTime called")
+	c.AddTime(4 * time.Millisecond)
+	assertBool(t, true, c.Since(before) == 4*time.Millisecond, "expected Since to return time added with AddTime")
+}
