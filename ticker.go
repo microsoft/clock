@@ -19,14 +19,19 @@ var _ Ticker = new(mockTicker)
 // in the event that the clock skips more than the timer interval. I've
 // not yet dug deep into the runtimeTimer to see how that works.
 // PRs are appreciated!
-func (m *mockTicker) wait() {
+func (m *mockTicker) wait(ready chan<- struct{}) {
 	for i := time.Duration(1); true; i++ {
 		delta := m.start.Add(m.interval * i).Sub(m.clock.Now())
+		afterChan := m.clock.After(delta)
+
+		if i == time.Duration(1) {
+			ready <- struct{}{}
+		}
 
 		select {
 		case <-m.stop:
 			return
-		case <-m.clock.After(delta):
+		case <-afterChan:
 			select {
 			case m.c <- m.clock.Now():
 			case <-m.stop:
@@ -54,7 +59,10 @@ func NewMockTicker(c Clock, interval time.Duration) Ticker {
 		start:    c.Now(),
 		clock:    c,
 	}
-	go t.wait()
 
+	ready := make(chan struct{})
+	go t.wait(ready)
+	<-ready
 	return t
 }
+
