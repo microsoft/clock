@@ -93,7 +93,13 @@ func (m *MockClock) SetTime(t time.Time) {
 	m.cond.L.Lock()
 	defer m.cond.L.Unlock()
 
-	assertFuture(m.now, t)
+	if (m.now != time.Time{}) {
+		// if m.now is the default value of time.Time{}, this assertion can fail. the unixnano value
+		// for the default time is very large and negative, but sufficiently large values of t cast to
+		// int64 may return negative numbers which are more negative than this default time's value
+		assertFuture(m.now, t)
+	}
+
 	m.now = t
 	m.cond.Broadcast()
 }
