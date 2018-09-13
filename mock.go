@@ -109,9 +109,8 @@ func (m *MockClock) AddTime(d time.Duration) {
 }
 
 func assertFuture(a, b time.Time) {
-	na, nb := a.UnixNano(), b.UnixNano()
-	if na > nb {
-		panic(fmt.Sprintf("Tried to tick backwards from %d to %d, but cannot travel into the past!", na, nb))
+	if a.After(b) {
+		panic(fmt.Sprintf("Tried to tick backwards from %v to %v, but cannot travel into the past!", a, b))
 	}
 }
 
