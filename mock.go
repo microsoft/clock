@@ -93,13 +93,7 @@ func (m *MockClock) SetTime(t time.Time) {
 	m.cond.L.Lock()
 	defer m.cond.L.Unlock()
 
-	if !m.now.IsZero() {
-		// if m.now is the zero time instant, this assertion can fail. the int64 value for the default
-		// time is very large and negative, but sufficiently large values of t cast to int64 may return
-		// negative numbers which are more negative than this default time's value
-		assertFuture(m.now, t)
-	}
-
+	assertFuture(m.now, t)
 	m.now = t
 	m.cond.Broadcast()
 }
@@ -115,9 +109,8 @@ func (m *MockClock) AddTime(d time.Duration) {
 }
 
 func assertFuture(a, b time.Time) {
-	na, nb := a.UnixNano(), b.UnixNano()
-	if na > nb {
-		panic(fmt.Sprintf("Tried to tick backwards from %d to %d, but cannot travel into the past!", na, nb))
+	if a.After(b) {
+		panic(fmt.Sprintf("Tried to tick backwards from %v to %v, but cannot travel into the past!", a, b))
 	}
 }
 
