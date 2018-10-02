@@ -54,6 +54,6 @@ func (d *defaultTicker) Chan() <-chan time.Time {
 	return d.C
 }
 
-// Default clock that uses time.Now as its time source. This is what you should
+// C holds a default clock that uses time.Now as its time source. This is what you should
 // normally use in your code.
 var C = DefaultClock{}

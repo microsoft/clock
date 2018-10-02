@@ -27,7 +27,7 @@ type Timer interface {
 	Stop() bool
 }
 
-// The Timer is an interface for time.Ticket, and can also be swapped in mocks.
+// The Ticker is an interface for time.Ticker, and can also be swapped in mocks.
 // This *does* change its API so that it can fit into an interface -- rather
 // than using the channel at .C, you should call Chan() and use the
 // returned channel just as you would .C.

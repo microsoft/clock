@@ -70,7 +70,7 @@ func (m *mockTimer) Stop() bool {
 	return wasActive
 }
 
-// Creates a new Timer using the provided Clock. You should not use this
+// NewMockTimer creates a new Timer using the provided Clock. You should not use this
 // directly outside of unit tests; use Clock.NewTimer().
 func NewMockTimer(c Clock) Timer {
 	return &mockTimer{

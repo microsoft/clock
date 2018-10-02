@@ -70,14 +70,14 @@ func (m *MockClock) AfterFunc(d time.Duration, f func()) Timer {
 	return t
 }
 
-// NewTimer creates a new Timer that will send the current time on its channel after at least duration d.
+// NewTimer creates a new mock Timer that will send the current time on its channel after at least duration d.
 func (m *MockClock) NewTimer(d time.Duration) Timer {
 	t := NewMockTimer(m)
 	t.Reset(d)
 	return t
 }
 
-// NewTimer creates a new Timer that will send the current time on its channel after at least duration d.
+// NewTicker returns a new mock Ticker containing a channel that will send the time with a period specified by the duration argument.
 // Note: unlike the default ticker included in Go, the mock ticker will *never* skip ticks as time advances.
 func (m *MockClock) NewTicker(d time.Duration) Ticker {
 	return NewMockTicker(m, d)
@@ -88,7 +88,7 @@ func (m *MockClock) Since(t time.Time) time.Duration {
 	return m.Now().Sub(t)
 }
 
-// Sets the mock clock's time to the given absolute time.
+// SetTime sets the mock clock's time to the given absolute time.
 func (m *MockClock) SetTime(t time.Time) {
 	m.cond.L.Lock()
 	defer m.cond.L.Unlock()
@@ -98,7 +98,7 @@ func (m *MockClock) SetTime(t time.Time) {
 	m.cond.Broadcast()
 }
 
-// Adds the given time duration to the clock.
+// AddTime adds the given time duration to the clock.
 func (m *MockClock) AddTime(d time.Duration) {
 	m.cond.L.Lock()
 	defer m.cond.L.Unlock()
@@ -114,7 +114,7 @@ func assertFuture(a, b time.Time) {
 	}
 }
 
-// Creates a new mock clock, with its current time set to the provided
+// NewMockClock creates a new mock clock, with its current time set to the provided
 // optional start time.
 func NewMockClock(start ...time.Time) *MockClock {
 	m := &MockClock{cond: sync.NewCond(new(sync.Mutex))}
