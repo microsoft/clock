@@ -49,7 +49,7 @@ func (m *mockTicker) Stop() {
 	m.stop <- true
 }
 
-// Creates a new Ticker using the provided Clock. You should not use this
+// NewMockTicker creates a new Ticker using the provided Clock. You should not use this
 // directly outside of unit tests; use Clock.NewTicker().
 func NewMockTicker(c Clock, interval time.Duration) Ticker {
 	t := &mockTicker{
@@ -65,4 +65,3 @@ func NewMockTicker(c Clock, interval time.Duration) Ticker {
 	<-ready
 	return t
 }
-
