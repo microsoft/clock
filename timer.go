@@ -16,13 +16,6 @@ type mockTimer struct {
 
 var _ Timer = new(mockTimer)
 
-func (m *mockTimer) getTarget() time.Time {
-	m.lock <- struct{}{}
-	defer func() { <-m.lock }()
-
-	return m.target
-}
-
 func (m *mockTimer) setInactive() {
 	// If a release was sent in the meantime, that means a new timer
 	// was started or that we already stopped manually
