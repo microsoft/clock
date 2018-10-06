@@ -33,15 +33,14 @@ func (m *MockClock) After(d time.Duration) <-chan time.Time {
 	go func() {
 		for {
 			m.cond.L.Lock()
-			if target.After(m.now) {
-				m.cond.Wait()
-			} else {
+			if !target.After(m.now) {
 				now := m.now
 				m.cond.L.Unlock()
 				ch <- now
 				return
 			}
 
+			m.cond.Wait()
 			m.cond.L.Unlock()
 		}
 	}()
@@ -121,11 +120,13 @@ func NewMockClock(start ...time.Time) *MockClock {
 
 	if len(start) > 1 {
 		panic(fmt.Sprintf("Expected one argument to clock.NewMock, got %d", len(start)))
-	} else if len(start) == 1 {
-		m.SetTime(start[0])
-	} else {
-		m.SetTime(time.Now().UTC())
 	}
 
+	if len(start) == 1 {
+		m.SetTime(start[0])
+		return m
+	}
+
+	m.SetTime(time.Now().UTC())
 	return m
 }

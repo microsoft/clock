@@ -29,6 +29,32 @@ func assertBool(t *testing.T, expected, actual bool, fail string) {
 	}
 }
 
+func TestNewMockClockWithManyArguments(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Errorf("expected code to have panicked!")
+			}
+		}()
+		NewMockClock(time.Now(), time.Now().Add(time.Second*5))
+	}()
+}
+func TestNewMockClockWithOneArguments(t *testing.T) {
+	date, _ := time.Parse(time.UnixDate, "Sat Mar  7 11:12:39 PST 2015")
+	c := NewMockClock(date)
+	if c.Now() != date {
+		t.Errorf("expected date to be %v, but got %v", date, c.Now())
+	}
+}
+
+func TestNewMockClockWithNoArguments(t *testing.T) {
+	c := NewMockClock()
+	dt := time.Now().Sub(c.Now())
+	if dt > time.Millisecond {
+		t.Errorf("expected diference in time to be less than 1ms")
+	}
+}
+
 func TestAfterGetsNegative(t *testing.T) {
 	c := NewMockClock()
 	assertGets(t, c.After(-time.Millisecond), "expected negative time to elapse immediately")
