@@ -8,10 +8,10 @@ type mockTimer struct {
 	c       chan time.Time
 	release chan bool
 
-	lock   chan struct{}
-	clock  Clock
-	active bool
-	target time.Time
+	lock    chan struct{}
+	clock   Clock
+	active  bool
+	trigger <-chan time.Time
 }
 
 var _ Timer = new(mockTimer)
@@ -30,7 +30,7 @@ func (m *mockTimer) setInactive() {
 
 func (m *mockTimer) wait() {
 	select {
-	case <-m.clock.After(m.target.Sub(m.clock.Now())):
+	case <-m.trigger:
 		m.setInactive()
 		m.c <- m.clock.Now()
 	case <-m.release:
@@ -47,7 +47,7 @@ func (m *mockTimer) Reset(d time.Duration) bool {
 	defer func() { <-m.lock }()
 
 	wasActive, m.active = m.active, true
-	m.target = m.clock.Now().Add(d)
+	m.trigger = m.clock.After(d)
 
 	if wasActive {
 		m.release <- true
