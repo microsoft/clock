@@ -13,7 +13,7 @@ package main
 
 import (
     "fmt"
-    "github.com/WatchBeam/clock"
+    "github.com/mixer/clock"
 )
 
 func main() {
@@ -39,7 +39,7 @@ import (
     "testing"
     "time"
 
-    "github.com/WatchBeam/clock"
+    "github.com/mixer/clock"
     "github.com/stretchr/testify/assert"
 )
 
