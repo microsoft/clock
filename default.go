@@ -22,35 +22,35 @@ func (dc DefaultClock) Tick(d time.Duration) <-chan time.Time { return time.Tick
 
 // AfterFunc waits for the duration to elapse and then calls f in its own goroutine. It returns a Timer that can be used to cancel the call using its Stop method.
 func (dc DefaultClock) AfterFunc(d time.Duration, f func()) Timer {
-	return &defaultTimer{*time.AfterFunc(d, f)}
+	return defaultTimer{time.AfterFunc(d, f)}
 }
 
 // NewTimer creates a new Timer that will send the current time on its channel after at least duration d.
 func (dc DefaultClock) NewTimer(d time.Duration) Timer {
-	return &defaultTimer{*time.NewTimer(d)}
+	return defaultTimer{time.NewTimer(d)}
 }
 
 // NewTicker returns a new Ticker containing a channel that will send the time with a period specified by the duration argument.
 func (dc DefaultClock) NewTicker(d time.Duration) Ticker {
-	return &defaultTicker{*time.NewTicker(d)}
+	return defaultTicker{time.NewTicker(d)}
 }
 
 // Since returns the time elapsed since t.
 func (dc DefaultClock) Since(t time.Time) time.Duration { return time.Since(t) }
 
-type defaultTimer struct{ time.Timer }
+type defaultTimer struct{ *time.Timer }
 
 var _ Timer = new(defaultTimer)
 
-func (d *defaultTimer) Chan() <-chan time.Time {
+func (d defaultTimer) Chan() <-chan time.Time {
 	return d.C
 }
 
-type defaultTicker struct{ time.Ticker }
+type defaultTicker struct{ *time.Ticker }
 
 var _ Ticker = new(defaultTicker)
 
-func (d *defaultTicker) Chan() <-chan time.Time {
+func (d defaultTicker) Chan() <-chan time.Time {
 	return d.C
 }
 
